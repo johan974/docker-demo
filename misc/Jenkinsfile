@@ -17,4 +17,8 @@ node {
        def app = docker.build("solvedshared/nodejs-demo:${commit_id}", '.').push()
      }
    }
+   stage('docker run') {
+     sh "docker run -p 3000:3000 -d --name my-nodejs-app solvedshared/nodejs-demo:${commit_id}" 
+   }
+   
 }
