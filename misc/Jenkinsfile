@@ -13,6 +13,7 @@ node {
      // DIT KAN NIET: onbekend: sh "npm -v" 
      // OOK 'node -v' kan ie niet vinden. 
      // LET OP ... dit kan wel !! Logisch want die zit in de Jenkins IMAGE!
+     sh "npm -v" 
      sh "docker ps" 
    }
    stage('docker build/push') {
