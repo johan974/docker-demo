@@ -6,15 +6,11 @@ node {
      commit_id = readFile('.git/commit-id').trim()
    }
    stage('test') {
-     nodejs(nodeJSInstallationName: 'nodejs') {
-       sh 'npm install --only=dev'
-       sh 'npm test'
-     }
-     // DIT KAN NIET: onbekend: sh "npm -v" 
-     // OOK 'node -v' kan ie niet vinden. 
-     // LET OP ... dit kan wel !! Logisch want die zit in de Jenkins IMAGE!
      sh "npm -v" 
      sh "docker ps" 
+     // don't need Global Tools anymore: nodejs(nodeJSInstallationName: 'nodejs') {
+     sh 'npm install --only=dev'
+     sh 'npm test'     
    }
    stage('docker build/push') {
      docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
@@ -22,7 +18,18 @@ node {
      }
    }
    stage('docker run') {
-     sh "docker run -p 3000:3000 -d --name my-nodejs-app solvedshared/nodejs-demo:${commit_id}" 
+      // If applicable - stop any running application
+      try { 
+         sh "docker stop my-nodejs-app" 
+      } catch( Exception e) { 
+      }
+      // If applicable - remove any created container
+      try { 
+         sh "docker container rm my-nodejs-app" 
+      } catch( Exception e) { 
+      }
+      
+      sh "docker run -p 3000:3000 -d --name my-nodejs-app solvedshared/nodejs-demo:${commit_id}" 
    }
    
 }
